@@ -191,10 +191,12 @@
   }
 
   async function fetchJourneys(origin, destination, departAt) {
-    // Format as local ISO with +01:00 offset to match the Python implementation
+    // Format as local ISO with the actual UTC offset (GMT/BST aware)
     const pad = n => String(n).padStart(2, "0");
+    const off = -departAt.getTimezoneOffset();
+    const tz = `${off >= 0 ? "+" : "-"}${pad(Math.floor(Math.abs(off) / 60))}:${pad(Math.abs(off) % 60)}`;
     const ts = `${departAt.getFullYear()}-${pad(departAt.getMonth()+1)}-${pad(departAt.getDate())}` +
-               `T${pad(departAt.getHours())}:${pad(departAt.getMinutes())}:00+01:00`;
+               `T${pad(departAt.getHours())}:${pad(departAt.getMinutes())}:00${tz}`;
     const body = {
       origin:      { crs: origin,      group: false },
       destination: { crs: destination, group: false },
